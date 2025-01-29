@@ -57,7 +57,15 @@ let test_dedup () =
     to the function [f] that uses [(index, value)] of the current
     element
 *)
-let filteri f lst =
+let filteri f lst = 
+    let rec aux idx acc = function
+    | [] -> List.rev acc
+    | h::t when f idx h -> aux (idx + 1) (h::acc) t
+    | h::t -> aux (idx + 1) acc t
+    in
+    aux 0 [] lst
+
+let filteri_fold f lst =
     let aux acc elem =
         match acc with
         | (idx, acc_lst) when f idx elem ->
