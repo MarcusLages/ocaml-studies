@@ -91,9 +91,13 @@ let test_kvtree () =
     assert (kvtree_insert ~cmp:Int.compare 0 'h' t = 
         Node ((1, 'a'), Node ((-3, 'd'), Leaf, Node ((0, 'h'), Leaf, Leaf)),
         Node ((4, 'b'), Node ((2, 'c'), Leaf, Leaf), Node ((23, 'e'), Leaf, Leaf))));
+    assert (kvtree_insert ~cmp:Int.compare 1 'h' t =
+        Node ((1, 'h'), Node ((-3, 'd'), Leaf, Leaf),
+        Node ((4, 'b'), Node ((2, 'c'), Leaf, Leaf), Node ((23, 'e'), Leaf, Leaf)))); 
     assert (kvtree_delete ~cmp:Int.compare 1 t =
         Node ((-3, 'd'), Leaf,
         Node ((4, 'b'), Node ((2, 'c'), Leaf, Leaf), Node ((23, 'e'), Leaf, Leaf))));
+    assert (kvtree_delete ~cmp:Int.compare 134134 t = t);
     assert (kvtree_delete ~cmp:Int.compare 23 t =
     Node ((1, 'a'), Node ((-3, 'd'), Leaf, Leaf),
     Node ((4, 'b'), Node ((2, 'c'), Leaf, Leaf), Leaf)))
