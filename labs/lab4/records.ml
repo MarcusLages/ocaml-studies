@@ -9,15 +9,21 @@ type record = {
 let make_record firstname lastname score =
     {firstname; lastname; score}
 
+(** [parse] parses a line into a [record] *)
+let parse line = make_record "asdf" "asdfas" 0
+
 (** [get_records] is used to read records from an [in_channel],
     and then parse and store them into a list of [record]'s *)
 let rec get_records ic = 
-    let aux acc = ()
+    let rec aux acc =
+        try
+            let record = parse @@ read_line ()
+            in
+            aux @@ record::acc
+        with
+        | End_of_file -> acc
     in
     aux []
-
-(** [parse] parses a line into a [record] *)
-let parse line = make_record "asdf" "asdfas" 0
 
 (** [sort_records] sorts the [record]s ordered by their score
     in decreasing order *)
