@@ -1,3 +1,8 @@
+(*  Marcus Vinicius santos Lages
+    A01392327
+    Set 3-V
+*)
+
 (* Question 1a *)
 (** [digits n] returns the list of the digits of [n];
     Tail recursive
