@@ -35,7 +35,7 @@ let parse line =
 let rec get_records ic = 
     let rec aux acc =
         try
-            let record = parse @@ read_line ()
+            let record = parse @@ input_line ic
             in
             aux @@ record::acc
         with
