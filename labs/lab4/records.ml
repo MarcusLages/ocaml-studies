@@ -47,9 +47,35 @@ let rec get_records ic =
     in
     aux []
 
+(** [insert_record] returns a list with the given [record]
+    inserted in the right position in the [lst] according to
+    [cmp]*)
+let rec insert_record ~cmp record lst =
+    match lst with
+    | [] -> [record]
+    | h::t ->
+        if cmp record h <= 0 then
+            record::lst
+        else
+        h::insert_record ~cmp record t
+
 (** [sort_records] sorts the [record]s ordered by their score
     in decreasing order *)
-let sort_records lst = []
+let sort_records lst =
+    let cmp a b =
+        if a.score != b.score then
+            Int.compare b.score a.score
+        else
+            if a.lastname != b.lastname then
+                String.compare a.lastname b.lastname
+            else
+                String.compare a.firstname b.firstname
+    in
+    let rec aux l =
+        match l with
+        | [] -> []
+        | h::t -> insert_record ~cmp:cmp h @@ aux t
+    in aux lst
 
 (** [output_records] outputs the [records] to the screen *)
 let output_records lst =
