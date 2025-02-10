@@ -45,12 +45,12 @@ let fib' n =
 let square_root a =
   let next x = 0.5 *. (x +. a /. x) in
   let good_enough x = abs_float (x *. x -. a) < 0.000001 in
-  let aux x = if good_enough x then x else aux (next x) in
+  let rec aux x = if good_enough x then x else aux (next x) in
   aux 1.
 
 (* *)
 let square_root' n a =
   let next x = 0.5 *. (x +. a /. x) in
-  let aux i x = if i = 0 then x else aux (i - 1) (next x) in
+  let rec aux i x = if i = 0 then x else aux (i - 1) (next x) in
   aux n 1.
   
