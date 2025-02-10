@@ -24,7 +24,15 @@ let make_record firstname lastname score =
         line ([score]) is not between 0 and 100 (inclusive)
 *)
 let parse line =
-    match String.split_on_char ' ' line with
+    let words =
+        let aux acc x = 
+            match x with
+            | "" -> acc
+            | _ -> x::acc
+        in
+        List.rev @@ List.fold_left aux [] (String.split_on_char ' ' line)
+    in
+    match words with
     | fname::lname::score::_ ->
         make_record fname lname @@ int_of_string score
     | _ ->
