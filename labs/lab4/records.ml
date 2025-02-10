@@ -5,12 +5,30 @@ type record = {
     score: int
 }
 
-(** [make_record] creates a record by using the given inputs. *)
+(** [make_record] creates a record by using the given inputs;
+    Raises [Failure "invalid_score"] if {score} is not between
+    0 and 100 inclusive
+*)
 let make_record firstname lastname score =
-    {firstname; lastname; score}
+    if score < 0 || score > 100 then
+        failwith "record: invalid score"
+    else
+        {firstname; lastname; score}
 
-(** [parse] parses a line into a [record] *)
-let parse line = make_record "asdf" "asdfas" 0
+(** [parse] parses a line into a [record];
+    Raises [Failure "parse_record_error"] if there was not
+        enough data to create a record (less than 3 words)
+    Raises [Failure "int_of_string"] if the third data in the
+        line ([score]) is not an integer;
+    Raises [Failure "invalid_score"] if the third data in the
+        line ([score]) is not between 0 and 100 (inclusive)
+*)
+let parse line =
+    match String.split_on_char ' ' line with
+    | fname::lname::score::_ ->
+        make_record fname lname @@ int_of_string score
+    | _ ->
+        failwith "parse_record_error"
 
 (** [get_records] is used to read records from an [in_channel],
     and then parse and store them into a list of [record]'s *)
@@ -21,7 +39,11 @@ let rec get_records ic =
             in
             aux @@ record::acc
         with
-        | End_of_file -> acc
+        | End_of_file -> 
+            close_in ic;
+            acc
+        | Failure f ->
+            aux acc
     in
     aux []
 
@@ -30,7 +52,11 @@ let rec get_records ic =
 let sort_records lst = []
 
 (** [output_records] outputs the [records] to the screen *)
-let output_records lst = ()
+let output_records lst =
+    let aux acc elem =
+        Printf.printf "%3d %s %s\n" elem.score elem.firstname elem.lastname
+    in
+    List.fold_left aux () lst
 
 (** Initial function to run program and check for correct arguments
     and errors *)
