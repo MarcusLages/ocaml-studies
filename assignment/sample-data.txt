@@ -1,0 +1,7 @@
+ A  B  1
+ A  C  4  # the following line is invalid and is skipped
+ A  D -4
+ A  D  3
+ B  D  2
+ C  D  5  # the following line is also invalid & is skipped
+ E  F
