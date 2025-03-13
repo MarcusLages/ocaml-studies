@@ -1,9 +1,5 @@
-bryan tekken   80   sick
-homer simpson 23 dsfasdf
-bart
-aryan tekken 80 sick
-aryan dickson 80 sick
-homer sampson 23 dsfasdf
-marge simpson
-hammer simpson 49 dsfasdf
-asdf asedf asdf
+homer simpson  25 # bad at nuclear engineering
+ ned flander  ab  !! invalid
+  waylon smithers 100 ! high score
+ gary chelmers 5
+monty burns

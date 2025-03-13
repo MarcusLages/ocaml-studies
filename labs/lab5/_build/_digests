@@ -1,0 +1,6 @@
+"Rule: ocaml: mli -> cmi (%=kvtree )": "\169\146\140\168\137\242\205\015}\019\200_`\021Rd"
+"Resource: /home/marcus/ocaml-classes/labs/lab5/kvtree.mli": "\214\231h\152\r\011\152\\\173\180\1591\140\179@\127"
+"Rule: ocaml dependencies mli (%=kvtree )": "F/N\140\028g\152\141\172\206\154\181\236o\181\178"
+"Rule: ocaml dependencies ml (%=kvtree )": "\127\170\217\007Z6\215\195A\007:\140y\011\247\182"
+"Resource: /home/marcus/ocaml-classes/labs/lab5/kvtree.ml": "e\141\218\140\195\170\250\145\154\212N\167\164\204\217\203"
+"Rule: ocaml: ml & cmi -> cmo (%=kvtree )": "\204{2(\243[\186=.\192\247Y29\189B"

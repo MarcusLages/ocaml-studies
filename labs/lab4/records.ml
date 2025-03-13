@@ -102,5 +102,9 @@ let () =
             let records = get_records (open_in Sys.argv.(1))
             in
             output_records @@ sort_records records
+            (* 
+                Sys.argsv.(0) |> open_in |> get_records |> sort_records
+                    |> output_records
+            *)
         with
         | Sys_error msg -> Printf.fprintf stderr "%s\n" msg

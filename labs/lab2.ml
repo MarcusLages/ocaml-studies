@@ -13,18 +13,27 @@
 let map_fold_left transf lst= 
     List.rev (List.fold_left (fun acc x-> (transf x)::acc) [] lst)
 
+let mapi f lst =
+    let res, _ = List.fold_left (
+        fun (l, idx) x ->
+            (f idx x)::l, (idx + 1)
+    ) ([], 0) lst
+    in
+    List.rev res
+
 (** [map transf lst] maps every element of a list [lst]
     to another element in the return list according to the function
     [transf];
     Uses List.fold_right
 *)
 let map transf lst= 
-    List.fold_right (fun x acc-> (transf x)::acc) lst []
+    (* List.fold_right (fun x acc-> (transf x)::acc) lst [] *)
+    mapi (fun _ -> transf) lst
 
 (**/**)
 let test_map () =
-    assert(map (fun x -> x +1) [] = []);
-    assert(map (fun x -> x +1) [1;2;3;4;5] = [2;3;4;5;6]);
+    assert(map (fun x -> x + 1) [] = []);
+    assert(map (fun x -> x + 1) [1;2;3;4;5] = [2;3;4;5;6]);
     assert(map float_of_int [1;2;3;4;5] = [1.;2.;3.;4.;5.]);
     assert(map (fun x -> "Student " ^ x) ["M";"B";"R";"F"] =
         ["Student M";"Student B";"Student R";"Student F"])

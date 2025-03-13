@@ -139,3 +139,15 @@ let scan' () =
 
 let scan_line () =
     read_line ()
+
+let rec insert x = function
+    | [] -> [x]
+    | h::t when h < x ->
+        h::(insert x t)
+    | h::t ->
+        x::h::t
+
+let rec insertion_sort = function
+    | [] -> []
+    | h::t ->
+        insert h (insertion_sort t)
