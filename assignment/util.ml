@@ -59,7 +59,6 @@ let parse_edge line =
         (v1, v2, (int_of_string w))
     | _ ->
         failwith "parse_edge: Invalid line to create an edge."
-
             
 let read_data filename =
     let ic = open_in filename in
