@@ -53,4 +53,4 @@ let a_client = an_org <|> a_person
 let parse_file =
   let ic = open_in file in
   let content = really_input_string ic (in_channel_length ic) in
-  parse_string  ~consume:All (many1 (a_client <* ws)) content
+  parse_string  ~consume:All (many1 (ws *> a_client <* ws)) content

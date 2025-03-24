@@ -44,12 +44,12 @@ let dot =
 	peek_char >>=
 		function
 		| Some '.' -> advance 1 >>= fun () -> return true
-		| Some '.' -> return false
+		| _ -> return false
 	
 let float_str =
 	int_str >>= fun n ->
 		dot >>= fun b ->
 			if b then
 				uint_str >>= fun f ->
-					return (n ^ "." ^ f)
+					return (n ^ "." ^ f) 
 			
