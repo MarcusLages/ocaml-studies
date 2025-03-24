@@ -13,20 +13,24 @@ let add_edge (v1, v2, w) g =
     | "", _, _ | _, "", _ ->
         raise @@ Error "add_edge: cannot add an edge from/to an empty vertex"
     | _ ->
-        let add_to_list (v', w') el =
-            if List.exists (fun (cur_v, _) -> cur_v = v') el then el
-            else (v', w')::el
+        let add_to_list new_v new_w old_e =
+            match old_e with
+            | None -> Some [(new_v, new_w)]
+            | Some l ->
+                let check_valid_new_edge (cur_v, cur_w) =
+                    if cur_v = new_v && cur_w != new_w then
+                        raise @@ Error "add_edge: conflicting edge being added"
+                    else
+                        cur_v = new_v
+                in
+                if List.exists check_valid_new_edge l then Some l
+                else Some ((new_v, new_w)::l)
+
         in
-        match VEMap.find_opt v1 g, VEMap.find_opt v2 g with
-        | None, None ->
-            VEMap.add v1 [v2, w] g |> VEMap.add v2 [v1,w]
-        | None, Some l2 ->
-            VEMap.add v1 [v2, w] g |> VEMap.add v2 (add_to_list (v1, w) l2)
-        | Some l1, None ->
-            VEMap.add v1 (add_to_list (v2, w) l1) g |> VEMap.add v2 [v1,w]
-        | Some l1, Some l2 ->
-            VEMap.add v1 (add_to_list (v2, w) l1) g |> VEMap.add v2 (add_to_list (v1, w) l2)
-        
+        g 
+        |> VEMap.update v1 (add_to_list v2 w)
+        |> VEMap.update v2 (add_to_list v1 w)
+
 let of_edges l =
     List.fold_left (Fun.flip add_edge) empty l
 
