@@ -1,66 +1,80 @@
-module VEMap = Map.Make(String)
-type t = (string * int) list VEMap.t
-type edge = string * string * int
+module VSet = Set.Make(String)
 
-exception Error of string
+let lift2_default f o1 o2 =
+    match o1, o2 with
+    | None, None -> None
+    | Some _, None -> o1
+    | None, Some _ -> o2
+    | Some v1, Some v2 -> Some (f v1 v2)
 
-let empty = VEMap.empty
+let min_edge ((_, _, min_w_acc) as acc) ((_, _, min_w_next) as next) =
+    if min_w_acc <= min_w_next then acc
+    else next
 
-let add_edge (v1, v2, w) g =
-    match v1, v2, w with
-    | _  when v1 = v2 ->
-        raise @@ Error "add_edge: cannot add an edge from a vertex to itself"
-    | "", _, _ | _, "", _ ->
-        raise @@ Error "add_edge: cannot add an edge from/to an empty vertex"
-    | _ ->
-        let add_to_list new_v new_w old_e =
-            match old_e with
-            | None -> Some [(new_v, new_w)]
-            | Some l ->
-                let check_valid_new_edge (cur_v, cur_w) =
-                    if cur_v = new_v && cur_w != new_w then
-                        raise @@ Error "add_edge: conflicting edge being added"
-                    else
-                        cur_v = new_v
-                in
-                if List.exists check_valid_new_edge l then Some l
-                else Some ((new_v, new_w)::l)
-
+(* Think on how to check the previous *)
+let get_min_edge_opt visited v g =
+    match Graph.neighbours v g with
+    | [] -> None
+    | l ->
+        let aux acc (v_next, w_next) = 
+            match acc with
+                | None -> Some (v, v_next, w_next)
+                | Some acc_e ->
+                    Some (min_edge acc_e (v, v_next, w_next))
         in
-        g 
-        |> VEMap.update v1 (add_to_list v2 w)
-        |> VEMap.update v2 (add_to_list v1 w)
+        List.fold_left aux None (
+            List.filter (fun (dest, _) -> not (VSet.mem dest visited)) l
+        )
 
-let of_edges l =
-    List.fold_left (Fun.flip add_edge) empty l
+let unvisited_min_edge_opt visited g =
+    let min_edges = 
+        VSet.fold (
+            fun v acc' ->
+                (get_min_edge_opt visited v g)::acc'
+        ) visited []
+    in
+    List.fold_left (lift2_default min_edge) None min_edges
 
-let vertices g =
-    List.sort String.compare @@ 
-        VEMap.fold (fun v _  acc -> v::acc) g []
+let min_tree starter_v g =
+    let rec aux acc visited =
+        match unvisited_min_edge_opt visited g with
+        | None -> acc
+        | Some ((v1, v2, w) as next) ->
+            let tree_e, tree_w = acc in
+            aux (next::tree_e, (tree_w + w)) (VSet.add v2 visited)
+    in
+    aux ([], 0) (VSet.singleton starter_v)
 
-let is_vertex v g =
-    match VEMap.find_opt v g with
-    | Some _ -> true
-    | None -> false
+let parse_edge line =
+    let words =
+        let aux acc x = 
+            match x with
+            | "" -> acc
+            | _ -> x::acc
+        in
+        List.rev @@ List.fold_left aux [] (String.split_on_char ' ' line)
+    in
+    match words with
+    | v1::v2::w::_ ->
+        (v1, v2, (int_of_string w))
+    | _ ->
+        failwith "parse_edge: Invalid line to create an edge."
 
-let edges g =
-    List.sort (
-        fun (v1, v2, w) (v1', v2', w') ->
-            if v1 != v1' then String.compare v1 v1'
-            else String.compare v2 v2'
-    ) @@ VEMap.fold (
-        fun v e acc -> 
-            List.fold_left (
-                fun acc' (v', w) -> (v, v', w)::acc'
-            ) acc e
-    ) g []
-
-let neighbours v g =
-    match VEMap.find_opt v g with
-    | Some l ->
-        List.sort (fun (v, _) (v', _) -> String.compare v v') l
-    | None -> []
-
-let test =
-    of_edges [("D", "C", 5); ("A", "B", 1); ("A", "D", 3); ("A", "C", 4); ("B", "A", 1);
-              ("C", "A", 4); ("C", "D", 5); ("D", "A", 3); ("D", "B", 2); ("B", "D", 2)]
+            
+let read_data filename =
+    let ic = open_in filename in
+    let rec aux acc =
+        try
+            let edge = parse_edge (input_line ic)
+            in
+            aux (Graph.add_edge edge acc)
+        with
+        | End_of_file ->
+            close_in ic;
+            acc
+        | Graph.Error e ->
+            aux acc
+        | Failure e ->
+            aux acc
+    in
+    aux Graph.empty
