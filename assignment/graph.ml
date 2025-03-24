@@ -10,6 +10,8 @@ let add_edge (v1, v2, w) g =
     match v1, v2, w with
     | _  when v1 = v2 ->
         raise @@ Error "add_edge: cannot add an edge from a vertex to itself"
+    | _  when w <= 0 ->
+        raise @@ Error "add_edge: cannot add an edge non positive weight"
     | "", _, _ | _, "", _ ->
         raise @@ Error "add_edge: cannot add an edge from/to an empty vertex"
     | _ ->
@@ -60,7 +62,3 @@ let neighbours v g =
     | Some l ->
         List.sort (fun (v, _) (v', _) -> String.compare v v') l
     | None -> []
-
-let test =
-    of_edges [("D", "C", 5); ("A", "B", 1); ("A", "D", 3); ("A", "C", 4); ("B", "A", 1);
-              ("C", "A", 4); ("C", "D", 5); ("D", "A", 3); ("D", "B", 2); ("B", "D", 2)]
