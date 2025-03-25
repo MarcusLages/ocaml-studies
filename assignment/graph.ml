@@ -1,11 +1,31 @@
 module VEMap = Map.Make(String)
+
+(** [Graph.t] is represented by a [Map] of [string] as the vertex name to a
+    [list] of [string * int] tuples representing the edges of that vertex, 
+    with the first element being the name of the next vertex and the second
+    as the weight of the edge 
+*)
 type t = (string * int) list VEMap.t
+
+(** [Graph.edge] represents an edge between two vertices in the format of
+    [src_vertex * dest_vertex * weight]
+*)
 type edge = string * string * int
 
+(** exception raised by some of the functions *)
 exception Error of string
 
+(* [empty] is the empty graph *)
 let empty = VEMap.empty
 
+(** [add_edge] adds an edge to a graph [g]
+   * raises an exception if edge is invalid (one or both of the vertices
+     are empty strings, or the weight is not positive)
+   * raises an exception when a conflicting edge is being added e.g. 
+     empty |> add_edge ("A", "B", 1) |> add_edge ("B", "A", 2)
+     or when an edge joining a vertex to itself is being added
+   * a "no-op" when the "same" edge is added a second time
+*)
 let add_edge (v1, v2, w) g =
     match v1, v2, w with
     | _  when v1 = v2 ->
@@ -33,18 +53,22 @@ let add_edge (v1, v2, w) g =
         |> VEMap.update v1 (add_to_list v2 w)
         |> VEMap.update v2 (add_to_list v1 w)
 
+(** [of_edges] returns a graph from the specified list of edges; may raise an exception *)
 let of_edges l =
     List.fold_left (Fun.flip add_edge) empty l
 
+(** [vertices] eturns the list of all vertices in a graph sorted in ascending order *)
 let vertices g =
     List.sort String.compare @@ 
         VEMap.fold (fun v _  acc -> v::acc) g []
 
+(** [is_vertex] eturns whether a string is the name of a vertex in a graph *)
 let is_vertex v g =
     match VEMap.find_opt v g with
     | Some _ -> true
     | None -> false
 
+(** [edges] returns a sorted list of all edges in a graph; see write-up for example *)
 let edges g =
     List.sort (
         fun (v1, v2, w) (v1', v2', w') ->
@@ -57,6 +81,10 @@ let edges g =
             ) acc e
     ) g []
 
+(** [neighbours] returns sorted list of the neighbours of a specific vertex in a graph;
+   each neighbour is represented by a (vertex, weight) pair and the list
+   is sorted in ascending order of the neighbour vertices;
+   returns an empty list if the given vertex is not in the graph *)
 let neighbours v g =
     match VEMap.find_opt v g with
     | Some l ->
