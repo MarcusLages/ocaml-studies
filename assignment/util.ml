@@ -1,3 +1,7 @@
+(* Marcus Vinicius Santos Lages
+    A01392327
+*)
+
 (** Set is used to keep track of visited vertices *)
 module VSet = Set.Make(String)
 
@@ -51,11 +55,16 @@ let unvisited_min_edge_opt visited g =
     in
     List.fold_left (lift2_default min_edge) None min_edges
 
-(** [min_tree] returns a minimum spanning tree in a [Graph.t g] starting
+(** [min_tree'] returns a minimum spanning tree in a [Graph.t g] starting
     from vertex [starter_v] using Prim's algorithm, returning a tuple
-    with the list of [Graph.edge]'s and their total weight
+    with the list of [Graph.edge]'s and their total weight;
+
+    NOTE: I actually did this one first. It's pretty inefficient and kinda dumb,
+    but I spent like 7h on this one. But then, I just thought what if I did in
+    another way. And that other way took me 20 mins. I was sad. So I had to 
+    leave this code, to prove that my hours of effort weren't for nothing.
 *)
-let min_tree starter_v g =
+let min_tree' starter_v g =
     let rec aux acc visited =
         match unvisited_min_edge_opt visited g with
         | None -> acc
@@ -64,6 +73,26 @@ let min_tree starter_v g =
             aux (next::tree_e, (tree_w + w)) (VSet.add v2 visited)
     in
     aux ([], 0) (VSet.singleton starter_v)
+
+(** [min_tree] returns a minimum spanning tree in a [Graph.t g] starting
+    from vertex [starter_v] using Prim's algorithm, returning a tuple
+    with the list of [Graph.edge]'s and their total weight
+*)
+let min_tree v g =
+    let sorted_edges = g 
+        |> Graph.edges
+        |> List.sort (fun (_, _, w1) (_, _, w2) -> w1 - w2)
+    in
+    let rec aux ((acc_l, acc_w) as acc) next_v e_list =
+        let filt_e_list = List.filter (
+            fun (_, dest_v, _) -> dest_v <> next_v) e_list
+        in 
+        match filt_e_list with
+        | [] -> acc
+        | ((_, dest_v, w) as e)::t ->
+            aux (e::acc_l, w + acc_w) dest_v t
+    in
+    aux ([], 0) v sorted_edges
 
 (** [parse_edge] parses a line as [string] into a [Graph.edge];
     If there's not enough data, returns a [Failure]
@@ -103,3 +132,5 @@ let read_data filename =
             aux acc
     in
     aux Graph.empty
+
+let test = Graph.of_edges [("A", "B", 1); ("A", "C", 4); ("A", "D", 3); ("B", "D", 2); ("C", "D", 5)];;

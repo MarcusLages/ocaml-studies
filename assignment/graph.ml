@@ -1,3 +1,7 @@
+(* Marcus Vinicius Santos Lages
+    A01392327
+*)
+
 module VEMap = Map.Make(String)
 
 (** [Graph.t] is represented by a [Map] of [string] as the vertex name to a

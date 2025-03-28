@@ -1,3 +1,7 @@
+(* Marcus Vinicius Santos Lages
+    A01392327
+*)
+
 (** [parse_min_tree] receives a tuple with a list of [Graph.edge]'s
     and total weight of them and returns a formatted version of them
     as a [string]
